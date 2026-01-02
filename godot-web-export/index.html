@@ -1,0 +1,1283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Wind Jump</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow: hidden;
+        }
+
+        #gameContainer {
+            position: relative;
+            width: 100%;
+            max-width: 800px;
+            height: 600px;
+            background: linear-gradient(180deg, #87CEEB 0%, #E0F6FF 100%);
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(26, 26, 46, 0.95);
+            z-index: 10;
+            transition: opacity 0.3s ease;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        .title {
+            font-size: 48px;
+            font-weight: bold;
+            color: #00d4ff;
+            text-shadow: 0 0 20px rgba(0, 212, 255, 0.5);
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .subtitle {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 30px;
+        }
+
+        .instructions {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px 30px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .instructions h3 {
+            color: #00d4ff;
+            margin-bottom: 10px;
+        }
+
+        .instructions p {
+            color: #ccc;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+
+        .stats-display {
+            background: rgba(255, 215, 0, 0.1);
+            border: 1px solid rgba(255, 215, 0, 0.3);
+            padding: 15px 25px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-display h4 {
+            color: #ffd700;
+            margin-bottom: 8px;
+            font-size: 16px;
+        }
+
+        .stats-display p {
+            color: #fff;
+            font-size: 14px;
+            margin: 4px 0;
+        }
+
+        .name-input-container {
+            margin-bottom: 20px;
+        }
+
+        .name-input-container label {
+            color: #aaa;
+            font-size: 14px;
+            display: block;
+            margin-bottom: 8px;
+        }
+
+        .name-input {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(0, 212, 255, 0.3);
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            text-align: center;
+            width: 200px;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .name-input:focus {
+            border-color: #00d4ff;
+        }
+
+        .btn {
+            padding: 15px 40px;
+            font-size: 18px;
+            font-weight: bold;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #00d4ff, #0099cc);
+            color: white;
+            box-shadow: 0 5px 20px rgba(0, 212, 255, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(0, 212, 255, 0.6);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a5a);
+            color: white;
+            box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(255, 107, 107, 0.6);
+        }
+
+        .btn-success {
+            background: linear-gradient(135deg, #51cf66, #40c057);
+            color: white;
+            box-shadow: 0 5px 20px rgba(81, 207, 102, 0.4);
+        }
+
+        .result-title {
+            font-size: 42px;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .victory-title {
+            color: #51cf66;
+            text-shadow: 0 0 20px rgba(81, 207, 102, 0.5);
+        }
+
+        .defeat-title {
+            color: #ff6b6b;
+            text-shadow: 0 0 20px rgba(255, 107, 107, 0.5);
+        }
+
+        .score-display {
+            font-size: 24px;
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+
+        .level-display {
+            font-size: 18px;
+            color: #aaa;
+            margin-bottom: 20px;
+        }
+
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            pointer-events: none;
+            z-index: 5;
+        }
+
+        .hud-left, .hud-right, .hud-center {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .hud-center {
+            align-items: center;
+        }
+
+        .hud-item {
+            background: rgba(0, 0, 0, 0.7);
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-size: 14px;
+            font-weight: bold;
+        }
+
+        .wind-indicator {
+            background: rgba(0, 100, 200, 0.8);
+            font-size: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .wind-arrow {
+            font-size: 20px;
+            animation: windPulse 0.5s ease-in-out infinite;
+        }
+
+        @keyframes windPulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        #mobileControls {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            display: none;
+            justify-content: space-between;
+            padding: 0 20px;
+            z-index: 5;
+        }
+
+        .mobile-btn {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            font-size: 24px;
+            font-weight: bold;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: manipulation;
+        }
+
+        .mobile-btn:active {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(0.95);
+        }
+
+        .control-group {
+            display: flex;
+            gap: 15px;
+        }
+
+        .jump-btn {
+            background: rgba(0, 212, 255, 0.4);
+            border-color: rgba(0, 212, 255, 0.7);
+        }
+
+        @media (max-width: 850px) {
+            #gameContainer {
+                max-width: 100%;
+                height: 100vh;
+                border-radius: 0;
+            }
+
+            #mobileControls {
+                display: flex;
+            }
+
+            .title {
+                font-size: 36px;
+            }
+
+            .instructions {
+                padding: 15px 20px;
+                margin: 0 20px 20px;
+            }
+
+            .btn {
+                padding: 12px 30px;
+                font-size: 16px;
+            }
+        }
+
+        .leaderboard {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 10px;
+            padding: 15px;
+            margin-top: 15px;
+            max-width: 300px;
+        }
+
+        .leaderboard h4 {
+            color: #ffd700;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .leaderboard-entry {
+            display: flex;
+            justify-content: space-between;
+            color: #ccc;
+            font-size: 12px;
+            padding: 4px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .leaderboard-entry:last-child {
+            border-bottom: none;
+        }
+
+        .new-high-score {
+            animation: glow 1s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from { text-shadow: 0 0 10px #ffd700; }
+            to { text-shadow: 0 0 30px #ffd700, 0 0 40px #ffa500; }
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+
+        <!-- HUD -->
+        <div id="hud" class="hidden">
+            <div class="hud-left">
+                <div class="hud-item">Level: <span id="levelDisplay">1</span></div>
+                <div class="hud-item">Score: <span id="scoreDisplay">0</span></div>
+            </div>
+            <div class="hud-center">
+                <div class="hud-item wind-indicator">
+                    <span class="wind-arrow" id="windArrow">←</span>
+                    <span>Wind: <span id="windStrength">Light</span></span>
+                </div>
+            </div>
+            <div class="hud-right">
+                <div class="hud-item">Best: <span id="highScoreHud">0</span></div>
+            </div>
+        </div>
+
+        <!-- Mobile Controls -->
+        <div id="mobileControls">
+            <div class="control-group">
+                <button class="mobile-btn" id="leftBtn">←</button>
+                <button class="mobile-btn" id="rightBtn">→</button>
+            </div>
+            <button class="mobile-btn jump-btn" id="jumpBtn">↑</button>
+        </div>
+
+        <!-- Start Screen -->
+        <div id="startScreen" class="screen">
+            <div class="title">🌬️ Wind Jump</div>
+            <div class="subtitle">Master the wind, conquer the platforms!</div>
+            
+            <div class="instructions">
+                <h3>How to Play</h3>
+                <p>Jump across platforms while wind pushes you sideways!<br>
+                Arrow Keys / A,D to move | Space to jump<br>
+                Reach the green finish platform to win!</p>
+            </div>
+
+            <div class="stats-display">
+                <h4>🏆 Your Stats</h4>
+                <p>High Score: <span id="startHighScore">0</span></p>
+                <p>Last Player: <span id="lastPlayerDisplay">-</span></p>
+            </div>
+
+            <div class="name-input-container">
+                <label for="playerName">Enter Your Name:</label>
+                <input type="text" id="playerName" class="name-input" placeholder="Player" maxlength="15">
+            </div>
+
+            <button class="btn btn-primary" id="startBtn">Start Game</button>
+            
+            <div class="leaderboard" id="startLeaderboard">
+                <h4>🏅 Top Scores</h4>
+                <div id="leaderboardEntries"></div>
+            </div>
+        </div>
+
+        <!-- Victory Screen -->
+        <div id="victoryScreen" class="screen hidden">
+            <div class="result-title victory-title">🎉 Level Complete!</div>
+            <div class="score-display">Score: <span id="victoryScore">0</span></div>
+            <div class="level-display">Level <span id="victoryLevel">1</span> Cleared!</div>
+            <div id="newHighScoreVictory" class="score-display new-high-score hidden">🏆 New High Score!</div>
+            <button class="btn btn-success" id="nextLevelBtn">Next Level</button>
+            <button class="btn btn-secondary" id="victoryMenuBtn">Main Menu</button>
+        </div>
+
+        <!-- Game Complete Screen -->
+        <div id="completeScreen" class="screen hidden">
+            <div class="result-title victory-title">🏆 You Won!</div>
+            <div class="subtitle">All levels completed!</div>
+            <div class="score-display">Final Score: <span id="finalScore">0</span></div>
+            <div id="newHighScoreFinal" class="score-display new-high-score hidden">🏆 New High Score!</div>
+            <button class="btn btn-primary" id="playAgainBtn">Play Again</button>
+            <button class="btn btn-secondary" id="completeMenuBtn">Main Menu</button>
+        </div>
+
+        <!-- Defeat Screen -->
+        <div id="defeatScreen" class="screen hidden">
+            <div class="result-title defeat-title">💨 Blown Away!</div>
+            <div class="score-display">Score: <span id="defeatScore">0</span></div>
+            <div class="level-display">Reached Level <span id="defeatLevel">1</span></div>
+            <div id="newHighScoreDefeat" class="score-display new-high-score hidden">🏆 New High Score!</div>
+            <button class="btn btn-primary" id="retryBtn">Try Again</button>
+            <button class="btn btn-secondary" id="defeatMenuBtn">Main Menu</button>
+        </div>
+    </div>
+
+    <script>
+        // ==================== GAME CONFIGURATION ====================
+        const CONFIG = {
+            GRAVITY: 0.6,
+            PLAYER_SPEED: 5,
+            JUMP_FORCE: -14,
+            MAX_FALL_SPEED: 15,
+            LEVELS: [
+                {
+                    name: "Gentle Breeze",
+                    windMin: 0.1,
+                    windMax: 0.3,
+                    windChangeInterval: 3000,
+                    platforms: [
+                        { x: 50, y: 450, width: 120, height: 20 },
+                        { x: 200, y: 400, width: 100, height: 20 },
+                        { x: 350, y: 350, width: 100, height: 20 },
+                        { x: 480, y: 300, width: 100, height: 20 },
+                        { x: 620, y: 250, width: 120, height: 20, isFinish: true }
+                    ],
+                    scoreBonus: 100
+                },
+                {
+                    name: "Strong Gust",
+                    windMin: 0.3,
+                    windMax: 0.6,
+                    windChangeInterval: 2500,
+                    platforms: [
+                        { x: 50, y: 480, width: 100, height: 20 },
+                        { x: 180, y: 420, width: 80, height: 20 },
+                        { x: 300, y: 350, width: 80, height: 20 },
+                        { x: 420, y: 280, width: 80, height: 20 },
+                        { x: 540, y: 220, width: 80, height: 20 },
+                        { x: 660, y: 160, width: 100, height: 20, isFinish: true }
+                    ],
+                    scoreBonus: 200
+                },
+                {
+                    name: "Tornado Warning",
+                    windMin: 0.5,
+                    windMax: 1.0,
+                    windChangeInterval: 2000,
+                    platforms: [
+                        { x: 50, y: 500, width: 90, height: 20 },
+                        { x: 170, y: 440, width: 70, height: 20 },
+                        { x: 280, y: 380, width: 70, height: 20 },
+                        { x: 390, y: 320, width: 70, height: 20 },
+                        { x: 500, y: 260, width: 70, height: 20 },
+                        { x: 610, y: 200, width: 70, height: 20 },
+                        { x: 700, y: 140, width: 80, height: 20, isFinish: true }
+                    ],
+                    movingPlatforms: [
+                        { x: 280, y: 380, width: 70, height: 20, moveRange: 40, speed: 1.5 },
+                        { x: 500, y: 260, width: 70, height: 20, moveRange: 50, speed: 2 }
+                    ],
+                    scoreBonus: 300
+                }
+            ]
+        };
+
+        // ==================== GAME STATE ====================
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        
+        let gameState = {
+            isRunning: false,
+            currentLevel: 0,
+            score: 0,
+            highScore: 0,
+            playerName: 'Player',
+            lastPlayerName: '',
+            scores: []
+        };
+
+        let player = {
+            x: 80,
+            y: 400,
+            width: 30,
+            height: 40,
+            vx: 0,
+            vy: 0,
+            onGround: false,
+            facingRight: true
+        };
+
+        let wind = {
+            force: 0,
+            direction: 1,
+            targetForce: 0
+        };
+
+        let platforms = [];
+        let keys = {};
+        let animationId = null;
+        let windChangeTimer = null;
+        let lastTime = 0;
+
+        // ==================== CANVAS SETUP ====================
+        function resizeCanvas() {
+            const container = document.getElementById('gameContainer');
+            canvas.width = container.clientWidth;
+            canvas.height = container.clientHeight;
+        }
+        
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas);
+
+        // ==================== LOCAL STORAGE ====================
+        function getGameId() {
+            const urlParams = new URLSearchParams(window.location.search);
+            return urlParams.get('gameId') || 'wind-jump-default';
+        }
+
+        function loadGameData() {
+            // STEP 1: Initialize display to 0 immediately
+            document.getElementById('startHighScore').textContent = '0';
+            document.getElementById('highScoreHud').textContent = '0';
+            
+            // STEP 2: Request data from Applaa storage
+            const gameId = getGameId();
+            
+            try {
+                window.parent.postMessage({
+                    type: 'applaa-game-load-data',
+                    gameId: gameId
+                }, '*');
+            } catch (e) {
+                // Fallback to localStorage if not in iframe
+                loadFromLocalStorage();
+            }
+        }
+
+        function loadFromLocalStorage() {
+            const gameId = getGameId();
+            const storageKey = `applaa-game-data-${gameId}`;
+            
+            try {
+                const data = localStorage.getItem(storageKey);
+                if (data) {
+                    const gameData = JSON.parse(data);
+                    applyGameData(gameData);
+                }
+            } catch (e) {
+                console.log('localStorage not available');
+            }
+        }
+
+        function applyGameData(gameData) {
+            if (gameData) {
+                gameState.highScore = gameData.highScore || 0;
+                gameState.lastPlayerName = gameData.lastPlayerName || '';
+                gameState.scores = gameData.scores || [];
+                
+                // Update displays
+                document.getElementById('startHighScore').textContent = gameState.highScore.toLocaleString();
+                document.getElementById('highScoreHud').textContent = gameState.highScore.toLocaleString();
+                
+                if (gameState.lastPlayerName) {
+                    document.getElementById('lastPlayerDisplay').textContent = gameState.lastPlayerName;
+                    document.getElementById('playerName').value = gameState.lastPlayerName;
+                }
+                
+                updateLeaderboard();
+            }
+        }
+
+        function saveScore(playerName, score) {
+            const gameId = getGameId();
+            
+            // Update local state
+            if (score > gameState.highScore) {
+                gameState.highScore = score;
+            }
+            gameState.lastPlayerName = playerName;
+            
+            // Add to scores array
+            gameState.scores.push({
+                playerName: playerName,
+                score: score,
+                timestamp: new Date().toISOString()
+            });
+            
+            // Sort and keep top 10
+            gameState.scores.sort((a, b) => b.score - a.score);
+            gameState.scores = gameState.scores.slice(0, 10);
+            
+            // Try Applaa storage first
+            try {
+                window.parent.postMessage({
+                    type: 'applaa-game-save-score',
+                    gameId: gameId,
+                    playerName: playerName,
+                    score: score
+                }, '*');
+            } catch (e) {
+                // Fallback to localStorage
+                saveToLocalStorage();
+            }
+            
+            // Also save to localStorage as backup
+            saveToLocalStorage();
+        }
+
+        function saveToLocalStorage() {
+            const gameId = getGameId();
+            const storageKey = `applaa-game-data-${gameId}`;
+            
+            const data = {
+                gameId: gameId,
+                highScore: gameState.highScore,
+                lastPlayerName: gameState.lastPlayerName,
+                scores: gameState.scores
+            };
+            
+            try {
+                localStorage.setItem(storageKey, JSON.stringify(data));
+            } catch (e) {
+                console.log('Could not save to localStorage');
+            }
+        }
+
+        function updateLeaderboard() {
+            const container = document.getElementById('leaderboardEntries');
+            container.innerHTML = '';
+            
+            const topScores = gameState.scores.slice(0, 5);
+            
+            if (topScores.length === 0) {
+                container.innerHTML = '<div class="leaderboard-entry"><span>No scores yet</span></div>';
+                return;
+            }
+            
+            topScores.forEach((entry, index) => {
+                const div = document.createElement('div');
+                div.className = 'leaderboard-entry';
+                div.innerHTML = `<span>${index + 1}. ${entry.playerName}</span><span>${entry.score.toLocaleString()}</span>`;
+                container.appendChild(div);
+            });
+        }
+
+        // Listen for Applaa storage responses
+        window.addEventListener('message', (event) => {
+            if (event.data.type === 'applaa-game-data-loaded') {
+                applyGameData(event.data.data);
+            }
+        });
+
+        // ==================== INPUT HANDLING ====================
+        document.addEventListener('keydown', (e) => {
+            keys[e.code] = true;
+            if (['Space', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(e.code)) {
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            keys[e.code] = false;
+        });
+
+        // Mobile controls
+        const leftBtn = document.getElementById('leftBtn');
+        const rightBtn = document.getElementById('rightBtn');
+        const jumpBtn = document.getElementById('jumpBtn');
+
+        function setupMobileButton(btn, keyCode) {
+            btn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                keys[keyCode] = true;
+            });
+            btn.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                keys[keyCode] = false;
+            });
+            btn.addEventListener('mousedown', () => keys[keyCode] = true);
+            btn.addEventListener('mouseup', () => keys[keyCode] = false);
+            btn.addEventListener('mouseleave', () => keys[keyCode] = false);
+        }
+
+        setupMobileButton(leftBtn, 'ArrowLeft');
+        setupMobileButton(rightBtn, 'ArrowRight');
+        setupMobileButton(jumpBtn, 'Space');
+
+        // ==================== GAME LOGIC ====================
+        function initLevel(levelIndex) {
+            const level = CONFIG.LEVELS[levelIndex];
+            
+            // Reset player
+            player.x = level.platforms[0].x + 30;
+            player.y = level.platforms[0].y - player.height - 10;
+            player.vx = 0;
+            player.vy = 0;
+            player.onGround = false;
+            
+            // Setup platforms
+            platforms = level.platforms.map((p, i) => ({
+                ...p,
+                originalX: p.x,
+                moveOffset: 0
+            }));
+            
+            // Add moving platform data for level 3
+            if (level.movingPlatforms) {
+                level.movingPlatforms.forEach((mp, i) => {
+                    const platformIndex = platforms.findIndex(p => 
+                        p.originalX === mp.x && p.y === mp.y
+                    );
+                    if (platformIndex !== -1) {
+                        platforms[platformIndex].moving = true;
+                        platforms[platformIndex].moveRange = mp.moveRange;
+                        platforms[platformIndex].speed = mp.speed;
+                        platforms[platformIndex].moveOffset = 0;
+                    }
+                });
+            }
+            
+            // Setup wind
+            wind.force = (level.windMin + level.windMax) / 2;
+            wind.direction = Math.random() > 0.5 ? 1 : -1;
+            wind.targetForce = wind.force;
+            
+            // Start wind changes
+            if (windChangeTimer) clearInterval(windChangeTimer);
+            windChangeTimer = setInterval(() => {
+                changeWind(level);
+            }, level.windChangeInterval);
+            
+            updateWindDisplay();
+            updateHUD();
+        }
+
+        function changeWind(level) {
+            wind.direction = Math.random() > 0.5 ? 1 : -1;
+            wind.targetForce = level.windMin + Math.random() * (level.windMax - level.windMin);
+            updateWindDisplay();
+        }
+
+        function updateWindDisplay() {
+            const arrow = document.getElementById('windArrow');
+            const strength = document.getElementById('windStrength');
+            
+            arrow.textContent = wind.direction > 0 ? '→' : '←';
+            
+            const level = CONFIG.LEVELS[gameState.currentLevel];
+            if (wind.targetForce < level.windMin + (level.windMax - level.windMin) * 0.33) {
+                strength.textContent = 'Light';
+            } else if (wind.targetForce < level.windMin + (level.windMax - level.windMin) * 0.66) {
+                strength.textContent = 'Medium';
+            } else {
+                strength.textContent = 'Strong';
+            }
+        }
+
+        function updateHUD() {
+            document.getElementById('levelDisplay').textContent = gameState.currentLevel + 1;
+            document.getElementById('scoreDisplay').textContent = gameState.score.toLocaleString();
+            document.getElementById('highScoreHud').textContent = gameState.highScore.toLocaleString();
+        }
+
+        function update(deltaTime) {
+            if (!gameState.isRunning) return;
+            
+            const level = CONFIG.LEVELS[gameState.currentLevel];
+            
+            // Smooth wind transition
+            wind.force += (wind.targetForce - wind.force) * 0.05;
+            
+            // Player input
+            let moveX = 0;
+            if (keys['ArrowLeft'] || keys['KeyA']) {
+                moveX = -CONFIG.PLAYER_SPEED;
+                player.facingRight = false;
+            }
+            if (keys['ArrowRight'] || keys['KeyD']) {
+                moveX = CONFIG.PLAYER_SPEED;
+                player.facingRight = true;
+            }
+            
+            // Apply movement
+            player.vx = moveX;
+            
+            // Apply wind force (stronger when in air)
+            if (!player.onGround) {
+                player.vx += wind.force * wind.direction * 3;
+            }
+            
+            // Jump
+            if ((keys['Space'] || keys['ArrowUp'] || keys['KeyW']) && player.onGround) {
+                player.vy = CONFIG.JUMP_FORCE;
+                player.onGround = false;
+                gameState.score += 5; // Small score for jumping
+            }
+            
+            // Apply gravity
+            player.vy += CONFIG.GRAVITY;
+            if (player.vy > CONFIG.MAX_FALL_SPEED) {
+                player.vy = CONFIG.MAX_FALL_SPEED;
+            }
+            
+            // Update moving platforms
+            platforms.forEach(platform => {
+                if (platform.moving) {
+                    platform.moveOffset += platform.speed * 0.02;
+                    platform.x = platform.originalX + Math.sin(platform.moveOffset) * platform.moveRange;
+                }
+            });
+            
+            // Move player
+            player.x += player.vx;
+            player.y += player.vy;
+            
+            // Platform collision
+            player.onGround = false;
+            platforms.forEach(platform => {
+                if (checkPlatformCollision(player, platform)) {
+                    // Land on top
+                    if (player.vy > 0 && player.y + player.height - player.vy <= platform.y + 5) {
+                        player.y = platform.y - player.height;
+                        player.vy = 0;
+                        player.onGround = true;
+                        
+                        // Check if finish platform
+                        if (platform.isFinish) {
+                            levelComplete();
+                        }
+                    }
+                }
+            });
+            
+            // Screen boundaries
+            if (player.x < 0) player.x = 0;
+            if (player.x + player.width > canvas.width) player.x = canvas.width - player.width;
+            
+            // Fall off screen - game over
+            if (player.y > canvas.height + 50) {
+                gameOver();
+            }
+            
+            updateHUD();
+        }
+
+        function checkPlatformCollision(player, platform) {
+            return player.x < platform.x + platform.width &&
+                   player.x + player.width > platform.x &&
+                   player.y < platform.y + platform.height &&
+                   player.y + player.height > platform.y;
+        }
+
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw background gradient
+            const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+            gradient.addColorStop(0, '#87CEEB');
+            gradient.addColorStop(1, '#E0F6FF');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw clouds
+            drawClouds();
+            
+            // Draw wind particles
+            drawWindParticles();
+            
+            // Draw platforms
+            platforms.forEach(platform => {
+                if (platform.isFinish) {
+                    // Finish platform - green with flag
+                    ctx.fillStyle = '#2ECC71';
+                    ctx.shadowColor = '#27AE60';
+                    ctx.shadowBlur = 10;
+                    roundRect(ctx, platform.x, platform.y, platform.width, platform.height, 5);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Draw flag
+                    ctx.fillStyle = '#E74C3C';
+                    ctx.fillRect(platform.x + platform.width / 2 - 2, platform.y - 40, 4, 40);
+                    ctx.beginPath();
+                    ctx.moveTo(platform.x + platform.width / 2 + 2, platform.y - 40);
+                    ctx.lineTo(platform.x + platform.width / 2 + 25, platform.y - 30);
+                    ctx.lineTo(platform.x + platform.width / 2 + 2, platform.y - 20);
+                    ctx.fillStyle = '#E74C3C';
+                    ctx.fill();
+                } else if (platform.moving) {
+                    // Moving platform - orange
+                    ctx.fillStyle = '#F39C12';
+                    ctx.shadowColor = '#E67E22';
+                    ctx.shadowBlur = 8;
+                    roundRect(ctx, platform.x, platform.y, platform.width, platform.height, 5);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Platform pattern
+                    ctx.strokeStyle = '#E67E22';
+                    ctx.lineWidth = 2;
+                    for (let i = platform.x + 10; i < platform.x + platform.width - 5; i += 15) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, platform.y + 5);
+                        ctx.lineTo(i + 8, platform.y + platform.height - 5);
+                        ctx.stroke();
+                    }
+                } else {
+                    // Regular platform - brown wood style
+                    ctx.fillStyle = '#8B4513';
+                    ctx.shadowColor = '#5D3A1A';
+                    ctx.shadowBlur = 5;
+                    roundRect(ctx, platform.x, platform.y, platform.width, platform.height, 5);
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                    
+                    // Wood grain
+                    ctx.strokeStyle = '#6B3410';
+                    ctx.lineWidth = 1;
+                    for (let i = platform.x + 8; i < platform.x + platform.width - 5; i += 12) {
+                        ctx.beginPath();
+                        ctx.moveTo(i, platform.y + 3);
+                        ctx.lineTo(i, platform.y + platform.height - 3);
+                        ctx.stroke();
+                    }
+                    
+                    // Grass on top
+                    ctx.fillStyle = '#27AE60';
+                    roundRect(ctx, platform.x, platform.y, platform.width, 5, 3);
+                    ctx.fill();
+                }
+            });
+            
+            // Draw player
+            drawPlayer();
+        }
+
+        let cloudOffsets = [0, 100, 250, 400, 550];
+        function drawClouds() {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            
+            cloudOffsets.forEach((offset, i) => {
+                const x = (offset + Date.now() * 0.01 * (i % 2 === 0 ? 1 : -1) * wind.direction) % (canvas.width + 100) - 50;
+                const y = 50 + i * 40;
+                const size = 30 + i * 5;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, size, 0, Math.PI * 2);
+                ctx.arc(x + size * 0.8, y - size * 0.2, size * 0.7, 0, Math.PI * 2);
+                ctx.arc(x + size * 1.4, y, size * 0.6, 0, Math.PI * 2);
+                ctx.fill();
+            });
+        }
+
+        let windParticles = [];
+        function drawWindParticles() {
+            // Add new particles
+            if (Math.random() < 0.3 && gameState.isRunning) {
+                windParticles.push({
+                    x: wind.direction > 0 ? -10 : canvas.width + 10,
+                    y: Math.random() * canvas.height,
+                    speed: 2 + Math.random() * 3,
+                    size: 1 + Math.random() * 2,
+                    alpha: 0.3 + Math.random() * 0.4
+                });
+            }
+            
+            // Update and draw particles
+            ctx.strokeStyle = 'rgba(200, 220, 255, 0.6)';
+            windParticles = windParticles.filter(p => {
+                p.x += p.speed * wind.direction * wind.force * 5;
+                p.y += (Math.random() - 0.5) * 0.5;
+                
+                ctx.globalAlpha = p.alpha;
+                ctx.lineWidth = p.size;
+                ctx.beginPath();
+                ctx.moveTo(p.x, p.y);
+                ctx.lineTo(p.x - wind.direction * 20, p.y);
+                ctx.stroke();
+                
+                return (wind.direction > 0 ? p.x < canvas.width + 20 : p.x > -20);
+            });
+            ctx.globalAlpha = 1;
+        }
+
+        function drawPlayer() {
+            const px = player.x;
+            const py = player.y;
+            const pw = player.width;
+            const ph = player.height;
+            
+            ctx.save();
+            
+            // Flip if facing left
+            if (!player.facingRight) {
+                ctx.translate(px + pw / 2, 0);
+                ctx.scale(-1, 1);
+                ctx.translate(-(px + pw / 2), 0);
+            }
+            
+            // Shadow
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.beginPath();
+            ctx.ellipse(px + pw / 2, py + ph + 2, pw / 2, 5, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillStyle = '#3498DB';
+            roundRect(ctx, px + 5, py + 15, pw - 10, ph - 20, 5);
+            ctx.fill();
+            
+            // Head
+            ctx.fillStyle = '#FFEAA7';
+            ctx.beginPath();
+            ctx.arc(px + pw / 2, py + 10, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Hair (blowing in wind)
+            ctx.fillStyle = '#5D4037';
+            ctx.beginPath();
+            const hairOffset = wind.direction * wind.force * 5;
+            ctx.ellipse(px + pw / 2 + hairOffset, py + 5, 8, 6, 0, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Eyes
+            ctx.fillStyle = '#2C3E50';
+            ctx.beginPath();
+            ctx.arc(px + pw / 2 + 3, py + 9, 2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Smile
+            ctx.strokeStyle = '#2C3E50';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.arc(px + pw / 2, py + 12, 4, 0.1 * Math.PI, 0.9 * Math.PI);
+            ctx.stroke();
+            
+            // Legs
+            ctx.fillStyle = '#2C3E50';
+            ctx.fillRect(px + 8, py + ph - 8, 5, 8);
+            ctx.fillRect(px + pw - 13, py + ph - 8, 5, 8);
+            
+            // Arms (animated based on movement)
+            const armAngle = player.onGround ? 0 : Math.sin(Date.now() * 0.01) * 0.3;
+            ctx.save();
+            ctx.translate(px + pw - 5, py + 20);
+            ctx.rotate(armAngle);
+            ctx.fillStyle = '#FFEAA7';
+            ctx.fillRect(0, 0, 4, 12);
+            ctx.restore();
+            
+            ctx.save();
+            ctx.translate(px + 5, py + 20);
+            ctx.rotate(-armAngle);
+            ctx.fillStyle = '#FFEAA7';
+            ctx.fillRect(-4, 0, 4, 12);
+            ctx.restore();
+            
+            // Cape (blowing in wind)
+            if (!player.onGround) {
+                ctx.fillStyle = '#E74C3C';
+                ctx.beginPath();
+                const capeWave = Math.sin(Date.now() * 0.02) * 5;
+                ctx.moveTo(px + 5, py + 18);
+                ctx.quadraticCurveTo(
+                    px - 10 - wind.direction * wind.force * 20, 
+                    py + 25 + capeWave, 
+                    px - 5 - wind.direction * wind.force * 15, 
+                    py + 40
+                );
+                ctx.lineTo(px + 5, py + 35);
+                ctx.fill();
+            }
+            
+            ctx.restore();
+        }
+
+        function roundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+        }
+
+        function gameLoop(timestamp) {
+            if (!lastTime) lastTime = timestamp;
+            const deltaTime = timestamp - lastTime;
+            lastTime = timestamp;
+            
+            update(deltaTime);
+            draw();
+            
+            if (gameState.isRunning) {
+                animationId = requestAnimationFrame(gameLoop);
+            }
+        }
+
+        function startGame() {
+            const nameInput = document.getElementById('playerName');
+            gameState.playerName = nameInput.value.trim() || 'Player';
+            gameState.currentLevel = 0;
+            gameState.score = 0;
+            gameState.isRunning = true;
+            
+            hideAllScreens();
+            document.getElementById('hud').classList.remove('hidden');
+            
+            initLevel(0);
+            lastTime = 0;
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function levelComplete() {
+            gameState.isRunning = false;
+            if (windChangeTimer) clearInterval(windChangeTimer);
+            if (animationId) cancelAnimationFrame(animationId);
+            
+            const level = CONFIG.LEVELS[gameState.currentLevel];
+            gameState.score += level.scoreBonus;
+            
+            const isNewHighScore = gameState.score > gameState.highScore;
+            
+            if (gameState.currentLevel >= CONFIG.LEVELS.length - 1) {
+                // Game complete
+                document.getElementById('finalScore').textContent = gameState.score.toLocaleString();
+                document.getElementById('newHighScoreFinal').classList.toggle('hidden', !isNewHighScore);
+                
+                saveScore(gameState.playerName, gameState.score);
+                
+                hideAllScreens();
+                document.getElementById('completeScreen').classList.remove('hidden');
+            } else {
+                // Level complete
+                document.getElementById('victoryScore').textContent = gameState.score.toLocaleString();
+                document.getElementById('victoryLevel').textContent = gameState.currentLevel + 1;
+                document.getElementById('newHighScoreVictory').classList.toggle('hidden', !isNewHighScore);
+                
+                hideAllScreens();
+                document.getElementById('victoryScreen').classList.remove('hidden');
+            }
+        }
+
+        function nextLevel() {
+            gameState.currentLevel++;
+            gameState.isRunning = true;
+            
+            hideAllScreens();
+            document.getElementById('hud').classList.remove('hidden');
+            
+            initLevel(gameState.currentLevel);
+            lastTime = 0;
+            animationId = requestAnimationFrame(gameLoop);
+        }
+
+        function gameOver() {
+            gameState.isRunning = false;
+            if (windChangeTimer) clearInterval(windChangeTimer);
+            if (animationId) cancelAnimationFrame(animationId);
+            
+            const isNewHighScore = gameState.score > gameState.highScore;
+            
+            saveScore(gameState.playerName, gameState.score);
+            
+            document.getElementById('defeatScore').textContent = gameState.score.toLocaleString();
+            document.getElementById('defeatLevel').textContent = gameState.currentLevel + 1;
+            document.getElementById('newHighScoreDefeat').classList.toggle('hidden', !isNewHighScore);
+            
+            hideAllScreens();
+            document.getElementById('defeatScreen').classList.remove('hidden');
+        }
+
+        function hideAllScreens() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('victoryScreen').classList.add('hidden');
+            document.getElementById('completeScreen').classList.add('hidden');
+            document.getElementById('defeatScreen').classList.add('hidden');
+            document.getElementById('hud').classList.add('hidden');
+        }
+
+        function showMainMenu() {
+            gameState.isRunning = false;
+            if (windChangeTimer) clearInterval(windChangeTimer);
+            if (animationId) cancelAnimationFrame(animationId);
+            
+            // Update stats display
+            document.getElementById('startHighScore').textContent = gameState.highScore.toLocaleString();
+            if (gameState.lastPlayerName) {
+                document.getElementById('lastPlayerDisplay').textContent = gameState.lastPlayerName;
+            }
+            updateLeaderboard();
+            
+            hideAllScreens();
+            document.getElementById('startScreen').classList.remove('hidden');
+        }
+
+        // ==================== EVENT LISTENERS ====================
+        document.getElementById('startBtn').addEventListener('click', startGame);
+        document.getElementById('nextLevelBtn').addEventListener('click', nextLevel);
+        document.getElementById('retryBtn').addEventListener('click', startGame);
+        document.getElementById('playAgainBtn').addEventListener('click', startGame);
+        document.getElementById('victoryMenuBtn').addEventListener('click', showMainMenu);
+        document.getElementById('defeatMenuBtn').addEventListener('click', showMainMenu);
+        document.getElementById('completeMenuBtn').addEventListener('click', showMainMenu);
+
+        // Enter key to start
+        document.getElementById('playerName').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') startGame();
+        });
+
+        // ==================== INITIALIZATION ====================
+        loadGameData();
+        
+        // Initial draw
+        draw();
+    </script>
+</body>
+</html>

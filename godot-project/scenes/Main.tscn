@@ -1,0 +1,195 @@
+[gd_scene load_steps=5 format=3 uid="uid://main_scene_001"]
+
+[ext_resource type="Script" path="res://scripts/Main.gd" id="1"]
+[ext_resource type="Script" path="res://scripts/Player.gd" id="2"]
+[ext_resource type="Script" path="res://scripts/Platform.gd" id="3"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(30, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform1"]
+size = Vector2(120, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform2"]
+size = Vector2(100, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_finish"]
+size = Vector2(120, 20)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_death"]
+size = Vector2(1000, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_finish_area"]
+size = Vector2(100, 30)
+
+[node name="Main" type="Node2D"]
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+offset_right = 800.0
+offset_bottom = 600.0
+color = Color(0.529, 0.808, 0.922, 1)
+
+[node name="Player" type="CharacterBody2D" parent="."]
+position = Vector2(110, 400)
+script = ExtResource("2")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Player"]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="Sprite2D" type="Sprite2D" parent="Player"]
+
+[node name="AnimationPlayer" type="AnimationPlayer" parent="Player"]
+
+[node name="Cape" type="Line2D" parent="Player"]
+points = PackedVector2Array(0, 0, -5, 10, -10, 20)
+width = 8.0
+default_color = Color(0.906, 0.298, 0.235, 1)
+
+[node name="Platforms" type="Node2D" parent="."]
+
+[node name="Platform1" type="StaticBody2D" parent="Platforms"]
+position = Vector2(110, 450)
+script = ExtResource("3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Platform1"]
+shape = SubResource("RectangleShape2D_platform1")
+
+[node name="Sprite" type="ColorRect" parent="Platforms/Platform1"]
+offset_left = -60.0
+offset_top = -10.0
+offset_right = 60.0
+offset_bottom = 10.0
+color = Color(0.545, 0.271, 0.075, 1)
+
+[node name="Platform2" type="StaticBody2D" parent="Platforms"]
+position = Vector2(250, 400)
+script = ExtResource("3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Platform2"]
+shape = SubResource("RectangleShape2D_platform2")
+
+[node name="Sprite" type="ColorRect" parent="Platforms/Platform2"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 10.0
+color = Color(0.545, 0.271, 0.075, 1)
+
+[node name="Platform3" type="StaticBody2D" parent="Platforms"]
+position = Vector2(400, 350)
+script = ExtResource("3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Platform3"]
+shape = SubResource("RectangleShape2D_platform2")
+
+[node name="Sprite" type="ColorRect" parent="Platforms/Platform3"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 10.0
+color = Color(0.545, 0.271, 0.075, 1)
+
+[node name="Platform4" type="StaticBody2D" parent="Platforms"]
+position = Vector2(530, 300)
+script = ExtResource("3")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Platform4"]
+shape = SubResource("RectangleShape2D_platform2")
+
+[node name="Sprite" type="ColorRect" parent="Platforms/Platform4"]
+offset_left = -50.0
+offset_top = -10.0
+offset_right = 50.0
+offset_bottom = 10.0
+color = Color(0.545, 0.271, 0.075, 1)
+
+[node name="FinishPlatform" type="StaticBody2D" parent="Platforms"]
+position = Vector2(680, 250)
+script = ExtResource("3")
+is_finish = true
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/FinishPlatform"]
+shape = SubResource("RectangleShape2D_finish")
+
+[node name="Sprite" type="ColorRect" parent="Platforms/FinishPlatform"]
+offset_left = -60.0
+offset_top = -10.0
+offset_right = 60.0
+offset_bottom = 10.0
+color = Color(0.18, 0.8, 0.443, 1)
+
+[node name="Flag" type="Polygon2D" parent="Platforms/FinishPlatform"]
+position = Vector2(0, -30)
+color = Color(0.906, 0.298, 0.235, 1)
+polygon = PackedVector2Array(0, 0, 25, 10, 0, 20)
+
+[node name="FlagPole" type="ColorRect" parent="Platforms/FinishPlatform"]
+offset_left = -2.0
+offset_top = -40.0
+offset_right = 2.0
+offset_bottom = -10.0
+color = Color(0.4, 0.4, 0.4, 1)
+
+[node name="FinishArea" type="Area2D" parent="Platforms/FinishPlatform"]
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/FinishPlatform/FinishArea"]
+position = Vector2(0, -5)
+shape = SubResource("RectangleShape2D_finish_area")
+
+[node name="DeathZone" type="Area2D" parent="."]
+position = Vector2(400, 650)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DeathZone"]
+shape = SubResource("RectangleShape2D_death")
+
+[node name="WindTimer" type="Timer" parent="."]
+wait_time = 3.0
+autostart = true
+
+[node name="HUD" type="CanvasLayer" parent="."]
+
+[node name="TopBar" type="HBoxContainer" parent="HUD"]
+offset_left = 20.0
+offset_top = 15.0
+offset_right = 780.0
+offset_bottom = 45.0
+
+[node name="LevelLabel" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Level: 1"
+
+[node name="ScoreLabel" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Score: 0"
+
+[node name="HighScoreLabel" type="Label" parent="HUD/TopBar"]
+layout_mode = 2
+size_flags_horizontal = 2
+theme_override_font_sizes/font_size = 16
+text = "Best: 0"
+horizontal_alignment = 2
+
+[node name="WindIndicator" type="HBoxContainer" parent="HUD"]
+offset_left = 320.0
+offset_top = 50.0
+offset_right = 480.0
+offset_bottom = 80.0
+
+[node name="WindArrow" type="Label" parent="HUD/WindIndicator"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.392, 0.784, 1)
+theme_override_font_sizes/font_size = 24
+text = "←"
+
+[node name="WindLabel" type="Label" parent="HUD/WindIndicator"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.392, 0.784, 1)
+theme_override_font_sizes/font_size = 16
+text = "Light"
+
+[connection signal="finish_reached" from="Platforms/FinishPlatform" to="." method="_on_finish_reached"]

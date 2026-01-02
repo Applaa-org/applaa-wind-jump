@@ -1,0 +1,154 @@
+[gd_scene load_steps=2 format=3 uid="uid://start_screen_001"]
+
+[ext_resource type="Script" path="res://scripts/StartScreen.gd" id="1"]
+
+[node name="StartScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="Background" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+color = Color(0.102, 0.102, 0.18, 0.95)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -250.0
+offset_right = 200.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 15
+
+[node name="TitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 48
+text = "🌬️ Wind Jump"
+horizontal_alignment = 1
+
+[node name="SubtitleLabel" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.667, 0.667, 0.667, 1)
+theme_override_font_sizes/font_size = 16
+text = "Master the wind, conquer the platforms!"
+horizontal_alignment = 1
+
+[node name="InstructionsPanel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="MarginContainer" type="MarginContainer" parent="VBoxContainer/InstructionsPanel"]
+layout_mode = 2
+theme_override_constants/margin_left = 20
+theme_override_constants/margin_top = 15
+theme_override_constants/margin_right = 20
+theme_override_constants/margin_bottom = 15
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/InstructionsPanel/MarginContainer"]
+layout_mode = 2
+
+[node name="HowToPlayLabel" type="Label" parent="VBoxContainer/InstructionsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0, 0.831, 1, 1)
+theme_override_font_sizes/font_size = 18
+text = "How to Play"
+horizontal_alignment = 1
+
+[node name="InstructionsLabel" type="Label" parent="VBoxContainer/InstructionsPanel/MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 14
+text = "Jump across platforms while wind pushes you!
+Arrow Keys / A,D to move | Space to jump
+Reach the green finish platform to win!"
+horizontal_alignment = 1
+
+[node name="StatsPanel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/StatsPanel"]
+layout_mode = 2
+theme_override_constants/separation = 5
+
+[node name="StatsTitle" type="Label" parent="VBoxContainer/StatsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843, 0, 1)
+theme_override_font_sizes/font_size = 16
+text = "🏆 Your Stats"
+horizontal_alignment = 1
+
+[node name="HighScoreLabel" type="Label" parent="VBoxContainer/StatsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "High Score: 0"
+horizontal_alignment = 1
+
+[node name="LastPlayerLabel" type="Label" parent="VBoxContainer/StatsPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 14
+text = "Last Player: -"
+horizontal_alignment = 1
+
+[node name="NameContainer" type="VBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="NameLabel" type="Label" parent="VBoxContainer/NameContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.667, 0.667, 0.667, 1)
+theme_override_font_sizes/font_size = 14
+text = "Enter Your Name:"
+horizontal_alignment = 1
+
+[node name="PlayerNameInput" type="LineEdit" parent="VBoxContainer/NameContainer"]
+layout_mode = 2
+placeholder_text = "Player"
+alignment = 1
+max_length = 15
+
+[node name="ButtonContainer" type="HBoxContainer" parent="VBoxContainer"]
+layout_mode = 2
+alignment = 1
+theme_override_constants/separation = 20
+
+[node name="StartButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(150, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Start Game"
+
+[node name="CloseButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(100, 50)
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Close"
+
+[node name="LeaderboardPanel" type="PanelContainer" parent="VBoxContainer"]
+layout_mode = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="VBoxContainer/LeaderboardPanel"]
+layout_mode = 2
+
+[node name="LeaderboardTitle" type="Label" parent="VBoxContainer/LeaderboardPanel/VBoxContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843, 0, 1)
+theme_override_font_sizes/font_size = 14
+text = "🏅 Top Scores"
+horizontal_alignment = 1
+
+[node name="LeaderboardEntries" type="VBoxContainer" parent="VBoxContainer/LeaderboardPanel/VBoxContainer"]
+layout_mode = 2

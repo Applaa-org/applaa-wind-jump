@@ -1,0 +1,68 @@
+{
+  "game": {
+    "name": "Wind Jump",
+    "type": "2D",
+    "genre": "platformer",
+    "description": "Jump across platforms while strong wind pushes you sideways. Master the wind to reach the finish!"
+  },
+  "settings": {
+    "window": {"width": 800, "height": 600},
+    "physics": {"gravity": 980}
+  },
+  "player": {
+    "name": "Player",
+    "health": 1,
+    "speed": 200,
+    "jumpForce": 400,
+    "abilities": ["jump", "move"]
+  },
+  "entities": {
+    "enemies": [],
+    "collectibles": [],
+    "hazards": [
+      {
+        "name": "FallZone",
+        "type": "area",
+        "behavior": "instant_death"
+      }
+    ]
+  },
+  "mechanics": {
+    "wind": {
+      "levels": [
+        {"min": 50, "max": 100, "changeInterval": 3.0},
+        {"min": 100, "max": 200, "changeInterval": 2.5},
+        {"min": 150, "max": 300, "changeInterval": 2.0}
+      ]
+    }
+  },
+  "levels": [
+    {
+      "name": "Gentle Breeze",
+      "windStrength": "light",
+      "platforms": 5,
+      "scoreBonus": 100
+    },
+    {
+      "name": "Strong Gust", 
+      "windStrength": "medium",
+      "platforms": 6,
+      "scoreBonus": 200
+    },
+    {
+      "name": "Tornado Warning",
+      "windStrength": "strong",
+      "platforms": 7,
+      "movingPlatforms": true,
+      "scoreBonus": 300
+    }
+  ],
+  "logic": {
+    "winCondition": "reach_finish_platform",
+    "loseCondition": "fall_off_screen",
+    "scoring": {
+      "pointsPerJump": 5,
+      "levelBonus": [100, 200, 300]
+    }
+  }
+}
